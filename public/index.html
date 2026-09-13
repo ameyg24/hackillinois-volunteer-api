@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#183b40" />
+    <meta
+      name="description"
+      content="Find a volunteer shift and help make HackIllinois happen."
+    />
+    <title>Volunteer board · HackIllinois</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23183b40'/%3E%3Ctext x='20' y='29' text-anchor='middle' font-size='28' fill='%23fff' font-family='Georgia'%3Eh%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#board">Skip to shifts</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="HackIllinois volunteer board"
+        ><span class="brand-mark" aria-hidden="true">h</span>HackIllinois<span
+          class="brand-year"
+          >2027</span
+        ></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#board" aria-current="page">Volunteer board</a
+        ><a
+          href="https://github.com/ameyg24/hackillinois-volunteer-api"
+          target="_blank"
+          rel="noreferrer"
+          >GitHub <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="little-star" aria-hidden="true">✳</span> Behind every
+            great hackathon
+          </p>
+          <h1 id="page-title">
+            Find your<br />next shift<span class="period">.</span>
+          </h1>
+          <p class="intro">
+            Welcome the hackers. Keep things running.<br />A few hours of your
+            time can make a difference.
+          </p>
+          <a class="text-link" href="#board"
+            >See where you can help <span aria-hidden="true">↓</span></a
+          >
+        </div>
+        <aside class="crew-note" aria-label="Volunteer information">
+          <div class="note-top">
+            <span>HACKILLINOIS CREW</span><span aria-hidden="true">↗</span>
+          </div>
+          <div class="note-art" aria-hidden="true">
+            <span class="orbit orbit-one"></span
+            ><span class="orbit orbit-two"></span
+            ><span class="orbit orbit-three"></span
+            ><span class="orbit-center">hi.</span>
+          </div>
+          <div class="note-bottom">
+            <strong>A place for every helping hand.</strong>
+            <p>From the first check-in to the final cleanup.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="identity-bar" aria-label="Volunteer selection">
+        <div class="identity-label">
+          <span class="avatar" aria-hidden="true" id="avatar">?</span>
+          <div>
+            <label for="volunteer-select">YOU’RE SIGNING UP AS</label
+            ><select id="volunteer-select" disabled>
+              <option value="">Loading volunteers…</option>
+            </select>
+          </div>
+        </div>
+        <p>New to the crew?</p>
+        <button class="button button-outline" id="register-button">
+          Register a volunteer <span aria-hidden="true">+</span>
+        </button>
+      </section>
+
+      <div
+        class="notice"
+        id="notice"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></div>
+      <div class="error-banner" id="load-error" role="alert" hidden></div>
+
+      <section id="board" class="board" aria-labelledby="board-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">LEND A HAND</p>
+            <h2 id="board-title">The shift board</h2>
+          </div>
+          <button class="button button-primary" id="create-button">
+            <span aria-hidden="true">+</span> Create a shift
+          </button>
+        </div>
+        <div class="board-toolbar">
+          <div class="filters" role="group" aria-label="Filter shifts">
+            <button class="filter active" id="all-filter" aria-pressed="true">
+              All shifts <span id="all-count">0</span></button
+            ><button class="filter" id="mine-filter" aria-pressed="false">
+              My shifts <span id="mine-count">0</span>
+            </button>
+          </div>
+          <div class="search-refresh">
+            <label class="search"
+              ><span class="sr-only">Search shifts</span
+              ><span aria-hidden="true">⌕</span
+              ><input
+                type="search"
+                id="search"
+                placeholder="Search shifts or locations" /></label
+            ><button
+              class="icon-button"
+              id="refresh-button"
+              aria-label="Refresh shifts"
+            >
+              ↻
+            </button>
+          </div>
+        </div>
+        <div class="board-meta">
+          <span id="results-label">Loading the schedule…</span
+          ><span id="timezone"></span>
+        </div>
+        <div class="shift-grid" id="shift-grid" aria-busy="true"></div>
+        <div class="empty-state" id="empty-state" hidden>
+          <span aria-hidden="true">✳</span>
+          <h3 id="empty-title">No shifts yet</h3>
+          <p id="empty-copy">
+            Create the first shift to get the crew together.
+          </p>
+        </div>
+        <button class="button button-outline load-more" id="load-more" hidden>
+          Load more shifts
+        </button>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand footer-brand" href="/">HackIllinois <span>2027</span></a>
+      <p>Made for the people who make it happen.</p>
+      <span class="connection" id="connection">Connecting</span>
+    </footer>
+    <p class="demo-note">
+      Interview demo · Volunteer identities are selectable and are not
+      authenticated.
+    </p>
+
+    <dialog id="volunteer-dialog" aria-labelledby="volunteer-title">
+      <form id="volunteer-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">JOIN THE CREW</p>
+            <h2 id="volunteer-title">Register a volunteer</h2>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            data-close
+            aria-label="Close registration"
+          >
+            ×
+          </button>
+        </div>
+        <p class="form-intro">Add a name to the board, then choose a shift.</p>
+        <label
+          >Full name<input
+            name="name"
+            autocomplete="name"
+            required
+            maxlength="100"
+            placeholder="Sam Rivera" /></label
+        ><label
+          >Email address<input
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+            maxlength="254"
+            placeholder="sam@example.com"
+        /></label>
+        <p class="form-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button class="button button-outline" type="button" data-close>
+            Cancel</button
+          ><button class="button button-primary" type="submit">
+            Register volunteer
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="shift-dialog" aria-labelledby="shift-title">
+      <form id="shift-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">PLAN THE WEEKEND</p>
+            <h2 id="shift-title">Create a shift</h2>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            data-close
+            aria-label="Close shift form"
+          >
+            ×
+          </button>
+        </div>
+        <input type="hidden" name="id" /><label
+          >Shift title<input
+            name="title"
+            required
+            maxlength="120"
+            placeholder="Welcome desk" /></label
+        ><label
+          >Location<input
+            name="location"
+            required
+            maxlength="200"
+            placeholder="Siebel Center lobby"
+        /></label>
+        <div class="form-columns">
+          <label
+            >Starts at<input
+              name="startsAt"
+              type="datetime-local"
+              required /></label
+          ><label
+            >Ends at<input name="endsAt" type="datetime-local" required
+          /></label>
+        </div>
+        <p class="field-note" id="form-timezone"></p>
+        <div class="form-columns">
+          <label
+            >Volunteer capacity<input
+              name="capacity"
+              type="number"
+              min="1"
+              max="500"
+              step="1"
+              value="4"
+              required
+          /></label>
+        </div>
+        <label
+          >Description <span class="optional">optional</span
+          ><textarea
+            name="description"
+            maxlength="2000"
+            rows="3"
+            placeholder="What will volunteers help with?"
+          ></textarea>
+        </label>
+        <p class="form-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button
+            class="button button-danger"
+            id="delete-shift"
+            type="button"
+            hidden
+          >
+            Delete shift
+          </button>
+          <div class="dialog-actions-right">
+            <button class="button button-outline" type="button" data-close>
+              Cancel</button
+            ><button
+              class="button button-primary"
+              id="save-shift"
+              type="submit"
+            >
+              Create shift
+            </button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

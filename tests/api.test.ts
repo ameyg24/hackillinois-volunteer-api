@@ -48,6 +48,17 @@ afterAll(async () => {
 });
 
 describe('volunteers', () => {
+  it('lists volunteers with pagination and rejects invalid query parameters', async () => {
+    await createVolunteer();
+    await createVolunteer('alex@example.com');
+    const first = await request(app).get('/volunteers?limit=1').expect(200);
+    expect(first.body.volunteers).toHaveLength(1);
+    expect(first.body.hasMore).toBe(true);
+    const second = await request(app).get('/volunteers?limit=1&offset=1').expect(200);
+    expect(second.body.hasMore).toBe(false);
+    expect(second.body.volunteers[0]._id).not.toBe(first.body.volunteers[0]._id);
+    await request(app).get('/volunteers?limit=101').expect(400);
+  });
   it('registers and retrieves a volunteer with a normalized email', async () => {
     const volunteerId = await createVolunteer('Sam@Example.com');
     const response = await request(app).get(`/volunteers/${volunteerId}`).expect(200);
@@ -206,6 +217,12 @@ describe('signups', () => {
 });
 
 describe('HTTP errors and health', () => {
+  it('serves the volunteer board and its browser assets', async () => {
+    const response = await request(app).get('/').expect(200).expect('Content-Type', /html/);
+    expect(response.text).toContain('The shift board');
+    await request(app).get('/styles.css').expect(200).expect('Content-Type', /css/);
+    await request(app).get('/app.js').expect(200).expect('Content-Type', /javascript/);
+  });
   it('runs the documented demo through a listening HTTP server', async () => {
     const server = app.listen(0, '127.0.0.1');
     await new Promise<void>(resolve => server.once('listening', resolve));

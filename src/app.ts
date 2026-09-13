@@ -1,12 +1,14 @@
 import express from 'express';
 import mongoose, { Types } from 'mongoose';
+import { fileURLToPath } from 'node:url';
 import { ApiError, errorHandler } from './errors.js';
 import { Shift, Volunteer } from './models.js';
-import { id, listQuery, shiftInput, shiftPatch, signupInput, volunteerInput } from './validation.js';
+import { id, listQuery, shiftInput, shiftPatch, signupInput, volunteerInput, volunteerListQuery } from './validation.js';
 
 export const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: '16kb' }));
+app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
 
 app.get('/health', (_req, res) => {
   const connected = mongoose.connection.readyState === 1;
@@ -16,6 +18,12 @@ app.get('/health', (_req, res) => {
 app.post('/volunteers', async (req, res) => {
   const volunteer = await Volunteer.create(volunteerInput.parse(req.body));
   res.status(201).location(`/volunteers/${volunteer.id}`).json({ volunteer });
+});
+
+app.get('/volunteers', async (req, res) => {
+  const { limit, offset } = volunteerListQuery.parse(req.query);
+  const volunteers = await Volunteer.find().sort({ name: 1, _id: 1 }).skip(offset).limit(limit + 1);
+  res.json({ volunteers: volunteers.slice(0, limit), hasMore: volunteers.length > limit });
 });
 
 app.get('/volunteers/:id', async (req, res) => {

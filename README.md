@@ -1,6 +1,21 @@
-# Volunteer API
+# Volunteer board and API
 
-A volunteer shift signup API for the HackIllinois systems challenge. Built with TypeScript, Express, MongoDB, Mongoose, and Zod.
+A volunteer shift signup API and a small web interface for the HackIllinois systems challenge. Built with TypeScript, Express, MongoDB, Mongoose, and Zod.
+
+## Try the web demo
+
+With Node.js 22+ and pnpm 10.33.0 installed:
+
+```sh
+pnpm install
+pnpm dev:demo
+```
+
+Open `http://127.0.0.1:3000`. The command downloads and starts a temporary real MongoDB 8 process, then creates six sample shifts and three sample volunteers. It does not connect to your configured development database. The sample data resets when the process stops. The first run needs internet access; if your machine prevents the MongoDB executable from running, use the persistent setup below with an available MongoDB instance.
+
+Choose Sam in the volunteer selector and join the one-person Welcome desk shift. Switch to Alex to see that it is full. Switch back to Sam, cancel, then let Alex claim the spot. The board also supports registration, search, a My shifts filter, roster details, and creating, editing, or deleting shifts. Times are shown in the browser's timezone.
+
+The frontend is plain HTML, CSS, and JavaScript in `public/`, served by Express from the same origin as the API. Every mutation calls the real API. MongoDB remains responsible for capacity and duplicate protection; disabling a full shift's button is only a convenience. Only the selected volunteer ID is saved in local storage. The selector is for demonstrating different volunteers, not authentication.
 
 ## Run locally
 
@@ -13,7 +28,7 @@ docker compose up -d
 pnpm dev
 ```
 
-The server listens on `http://localhost:3000`. In another terminal:
+The server serves the board and API at `http://localhost:3000`. To run the terminal demo in another terminal:
 
 ```sh
 pnpm demo
@@ -31,6 +46,7 @@ Request bodies are JSON. IDs are MongoDB ObjectIds. Times must be ISO 8601 strin
 | --- | --- | --- |
 | GET | `/health` | Database connection readiness |
 | POST | `/volunteers` | Register a volunteer with `name` and `email` |
+| GET | `/volunteers` | List volunteers by name, using `limit` and `offset` |
 | GET | `/volunteers/:id` | Retrieve a volunteer |
 | POST | `/shifts` | Create a shift |
 | GET | `/shifts` | List shifts in start-time order |
@@ -58,6 +74,8 @@ curl -i http://localhost:3000/shifts \
 `title`, `location`, `startsAt`, `endsAt`, and `capacity` are required. `description` is optional. Capacity is an integer from 1 to 500. Unknown body fields are rejected.
 
 List filters are optional: `from` (inclusive start time), `to` (exclusive start time), and `volunteerId`. Pagination uses `limit` (default 20, maximum 100) and `offset` (default 0, maximum 10,000).
+
+The board loads shifts in pages of 100. Search and counts apply to loaded shifts; use Load more shifts to include additional pages. The volunteer selector loads the paginated directory. It exposes registered names and emails, consistent with this demo's lack of authentication.
 
 ```sh
 curl 'http://localhost:3000/shifts?limit=10&offset=0'
@@ -103,6 +121,15 @@ pnpm test
 Tests use Supertest against Express and a temporary real MongoDB process through `mongodb-memory-server`. They do not use your configured database or require Docker. The first test run downloads a MongoDB binary and requires internet access.
 
 Coverage includes validation, email uniqueness, pagination and date filters, signup cancellation, started shifts, missing records, and concurrent requests for limited spots. Tests also race duplicate signups and capacity edits against signups. GitHub Actions runs the same checks.
+
+Browser tests exercise the actual frontend against a temporary MongoDB database, including a full signup/cancellation cycle, editing and deletion, server errors, and the mobile layout:
+
+```sh
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+GitHub Actions also runs these browser tests and saves desktop/mobile screenshots and failure traces in the `browser-results` artifact.
 
 ## References
 

@@ -25,6 +25,10 @@ export const shiftPatch = shiftFields.partial().refine(value => Object.keys(valu
   message: 'Provide at least one field to update',
 });
 export const signupInput = z.strictObject({ volunteerId: id });
+export const volunteerListQuery = z.strictObject({
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  offset: z.coerce.number().int().min(0).max(10000).default(0),
+});
 export const listQuery = z.strictObject({
   limit: z.coerce.number().int().min(1).max(100).default(20),
   offset: z.coerce.number().int().min(0).max(10000).default(0),
