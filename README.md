@@ -2,6 +2,8 @@
 
 A volunteer shift signup API and a small web interface for the HackIllinois systems challenge. Built with TypeScript, Express, MongoDB, Mongoose, and Zod.
 
+![Volunteer board with six sample shifts](docs/volunteer-board.png)
+
 ## Try the web demo
 
 With Node.js 22+ and pnpm 10.33.0 installed:

@@ -148,7 +148,7 @@ test("shows API errors, searches safely, and recovers after a connection error",
   await expect(
     page.getByRole("heading", { name: "No matching shifts" }),
   ).toBeVisible();
-  await page.getByRole("searchbox").fill("welcome");
+  await page.getByRole("searchbox").fill("welcome desk");
   await expect(page.locator(".shift-card")).toHaveCount(1);
   await page.route("**/health", (route) => route.abort());
   await page.getByRole("button", { name: "Refresh shifts" }).click();
